@@ -1,4 +1,4 @@
-name: CI e publicação
+name: CI e CD
 
 on:
   pull_request:
@@ -67,3 +67,87 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Implantar na VM
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+        with:
+          host: ${{ secrets.HOST_TEST }}
+          username: ${{ secrets.USER_TEST }}
+          key: ${{ secrets.KEY_TEST }}
+
+          envs: IMAGE_NAME,IMAGE_TAG,DOCKERHUB_USERNAME,DOCKERHUB_TOKEN,DB_PASSWORD
+
+          script: |
+            set -eu
+
+            echo "$DOCKERHUB_TOKEN" |
+              sudo docker login \
+                --username "$DOCKERHUB_USERNAME" \
+                --password-stdin
+
+            sudo docker network inspect app-network >/dev/null 2>&1 ||
+              sudo docker network create app-network
+
+            sudo docker volume inspect postgres-data >/dev/null 2>&1 ||
+              sudo docker volume create postgres-data
+
+            if ! sudo docker container inspect avaliacao-db >/dev/null 2>&1; then
+              sudo docker run -d \
+                --name avaliacao-db \
+                --restart unless-stopped \
+                --network app-network \
+                -e POSTGRES_DB=auladb \
+                -e POSTGRES_USER=usuario \
+                -e POSTGRES_PASSWORD="$DB_PASSWORD" \
+                -v postgres-data:/var/lib/postgresql/data \
+                postgres:17
+            else
+              sudo docker start avaliacao-db >/dev/null || true
+            fi
+
+            tentativas=0
+
+            until sudo docker exec avaliacao-db \
+              pg_isready -U usuario -d auladb >/dev/null 2>&1
+            do
+              tentativas=$((tentativas + 1))
+
+              if [ "$tentativas" -ge 30 ]; then
+                echo "PostgreSQL não ficou disponível"
+                sudo docker logs avaliacao-db
+                exit 1
+              fi
+
+              sleep 2
+            done
+
+            sudo docker pull "$IMAGE_NAME:$IMAGE_TAG"
+
+            sudo docker rm --force avaliacao-api >/dev/null 2>&1 || true
+
+            sudo docker run -d \
+              --name avaliacao-api \
+              --restart unless-stopped \
+              --network app-network \
+              -p 8081:8080 \
+              -e DB_HOST=avaliacao-db \
+              -e DB_PORT=5432 \
+              -e DB_NAME=auladb \
+              -e DB_USER=usuario \
+              -e DB_PASSWORD="$DB_PASSWORD" \
+              "$IMAGE_NAME:$IMAGE_TAG"
+
+            sudo docker image prune -f

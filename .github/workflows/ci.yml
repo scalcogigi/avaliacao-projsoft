@@ -1,0 +1,42 @@
+name: Testes
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v6
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Permitir execução do Maven Wrapper
+        run: chmod +x mvnw
+
+      - name: Executar testes e verificar cobertura
+        run: ./mvnw --batch-mode clean verify
+
+      - name: Salvar relatório do JaCoCo
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-jacoco
+          path: target/site/jacoco/
+          if-no-files-found: warn

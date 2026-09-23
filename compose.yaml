@@ -18,8 +18,17 @@ services:
       retries: 10
 
     networks:
-      - app-network
-
+      produtos:
+        driver: default
+        enable_ipv6: false            
+        driver_opts:
+          parent: eth0
+        ipam:
+          config:
+            - subnet: 172.22.0.0/16
+              gateway: 172.22.0.1 
+              ip_range: 172.22.0.1/30
+  
   app:
     build: .
     container_name: curso-api

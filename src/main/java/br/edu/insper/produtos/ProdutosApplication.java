@@ -1,12 +1,11 @@
-package br.edu.insper.cursos;
+package br.edu.insper.produtos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CursosApplication {
+public class ProdutosApplication {
     public static void main(String[] args) {
-        SpringApplication.run(CursosApplication.class, args);
+        SpringApplication.run(ProdutosApplication.class, args);
     }
 }
-

@@ -1,7 +1,7 @@
-package br.edu.insper.cursos.controller;
+package br.edu.insper.produtos.controller;
 
-import br.edu.insper.cursos.entity.Curso;
-import br.edu.insper.cursos.service.CursoService;
+import br.edu.insper.produtos.entity.Curso;
+import br.edu.insper.produtos.service.ProdutosService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,23 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cursos")
-public class CursoController {
-    private final CursoService service;
+@RequestMapping("/produtos")
+public class ProdutosController {
+    private final ProdutosService service;
 
-    public CursoController(CursoService service) {
+    public ProdutosController(ProdutosService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<Curso> listar(@RequestParam(required = false) String nome) {
+    public List<Produtos> listar(@RequestParam(required = false) String nome) {
         return service.listar(nome);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Curso criar(@Valid @RequestBody Curso curso) {
-        return service.criar(curso);
+    public Produtos criar(@Valid @RequestBody Produtos produtos) {
+        return service.criar(produtos);
     }
 
     @DeleteMapping("/{id}")

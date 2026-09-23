@@ -1,7 +1,7 @@
-package br.edu.insper.cursos.integration;
+package br.edu.insper.produtos.integration;
 
-import br.edu.insper.cursos.entity.Curso;
-import br.edu.insper.cursos.repository.CursoRepository;
+import br.edu.insper.produtos.entity.produtos;
+import br.edu.insper.produtos.repository.CursoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +17,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class CursoControllerIntegrationTest {
+class ProdutosControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private CursoRepository repository;
+    private ProdutosRepository repository;
 
     @BeforeEach
     void limparBanco() {
@@ -36,7 +36,7 @@ class CursoControllerIntegrationTest {
         salvar("Java antigo", true);
         salvar("Python", false);
 
-        mockMvc.perform(get("/cursos").param("nome", "java"))
+        mockMvc.perform(get("/produtos").param("nome", "java"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].deleted").value(false))
@@ -44,7 +44,7 @@ class CursoControllerIntegrationTest {
     }
 
     @Test
-    void postDeveCriarCurso() throws Exception {
+    void postDeveCriarProdutos() throws Exception {
         String json = """
                 {"nome":"Java","descricao":"Spring Boot","cargaHoraria":20}
                 """;
@@ -59,20 +59,20 @@ class CursoControllerIntegrationTest {
     }
 
     @Test
-    void deleteDeveMarcarCursoComoDeletado() throws Exception {
-        Curso curso = salvar("Java", false);
-        mockMvc.perform(delete("/cursos/{id}", curso.getId()))
+    void deleteDeveMarcarProdutoComoDeletado() throws Exception {
+        Produtos produto = salvar("Java", false);
+        mockMvc.perform(delete("/produtos/{id}", produtos.getId()))
                 .andExpect(status().isNoContent());
-        assert repository.findById(curso.getId()).orElseThrow().isDeleted();
+        assert repository.findById(produtos.getId()).orElseThrow().isDeleted();
     }
 
-    private Curso salvar(String nome, boolean deleted) {
-        Curso curso = new Curso();
-        curso.setNome(nome);
-        curso.setDescricao("Descrição");
-        curso.setCargaHoraria(20);
-        curso.setDeleted(deleted);
-        return repository.save(curso);
+    private Produtos salvar(String nome, boolean deleted) {
+        Produtos produtos = new Produtos();
+        produtos.setNome(nome);
+        produtos.setDescricao("Descrição");
+        produtos.setCargaHoraria(20);
+        produtos.setDeleted(deleted);
+        return repository.save(produtos);
     }
 }
 

@@ -1,7 +1,7 @@
-package br.edu.insper.cursos.service;
+package br.edu.insper.produtos.service;
 
-import br.edu.insper.cursos.entity.Curso;
-import br.edu.insper.cursos.repository.CursoRepository;
+import br.edu.insper.produtos.entity.produtos;
+import br.edu.insper.produtos.repository.produtosRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,64 +17,64 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CursoServiceTest {
+class ProdutosServiceTest {
     @Mock
-    private CursoRepository repository;
+    private ProdutosRepository repository;
 
     @InjectMocks
-    private CursoService service;
+    private ProdutosService service;
 
-    private Curso curso;
+    private Produtos produtos;
 
     @BeforeEach
     void preparar() {
-        curso = new Curso();
-        curso.setId(1L);
-        curso.setNome("Java");
-        curso.setCargaHoraria(20);
+        produtos = new Produtos();
+        produtos.setId(1L);
+        produtos.setNome("Java");
+        produtos.setCargaHoraria(20);
     }
 
     @Test
     void deveListarNaoDeletadosSemFiltroNulo() {
-        when(repository.findByDeletedFalse()).thenReturn(List.of(curso));
-        assertEquals(List.of(curso), service.listar(null));
+        when(repository.findByDeletedFalse()).thenReturn(List.of(produtos));
+        assertEquals(List.of(produtos), service.listar(null));
         verify(repository).findByDeletedFalse();
     }
 
     @Test
     void deveListarNaoDeletadosSemFiltroEmBranco() {
-        when(repository.findByDeletedFalse()).thenReturn(List.of(curso));
-        assertEquals(List.of(curso), service.listar("  "));
+        when(repository.findByDeletedFalse()).thenReturn(List.of(produtos));
+        assertEquals(List.of(produtos), service.listar("  "));
     }
 
     @Test
     void deveFiltrarPorInicioDoNome() {
-        when(repository.findByNomeStartingWithIgnoreCaseAndDeletedFalse("ja")).thenReturn(List.of(curso));
-        assertEquals(List.of(curso), service.listar("ja"));
+        when(repository.findByNomeStartingWithIgnoreCaseAndDeletedFalse("ja")).thenReturn(List.of(produtos));
+        assertEquals(List.of(produtos), service.listar("ja"));
         verify(repository).findByNomeStartingWithIgnoreCaseAndDeletedFalse("ja");
     }
 
     @Test
     void deveCriarComoNaoDeletadoESemIdFornecido() {
-        curso.setDeleted(true);
-        when(repository.save(curso)).thenReturn(curso);
-        Curso salvo = service.criar(curso);
-        assertSame(curso, salvo);
+        produtos.setDeleted(true);
+        when(repository.save(produtos)).thenReturn(produtos);
+        Produtos salvo = service.criar(produtos);
+        assertSame(produtos, salvo);
         assertNull(salvo.getId());
         assertFalse(salvo.isDeleted());
     }
 
     @Test
     void deveRealizarDelecaoLogica() {
-        when(repository.findById(1L)).thenReturn(Optional.of(curso));
+        when(repository.findById(1L)).thenReturn(Optional.of(produtos));
         service.deletar(1L);
-        assertTrue(curso.isDeleted());
-        verify(repository).save(curso);
+        assertTrue(produtos.isDeleted());
+        verify(repository).save(produtos);
         verify(repository, never()).delete(any());
     }
 
     @Test
-    void deveRetornar404QuandoCursoNaoExiste() {
+    void deveRetornar404QuandoprodutosNaoExiste() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
         ResponseStatusException erro = assertThrows(ResponseStatusException.class, () -> service.deletar(99L));
         assertEquals(404, erro.getStatusCode().value());

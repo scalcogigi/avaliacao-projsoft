@@ -1,7 +1,7 @@
 package br.edu.insper.produtos.service;
 
-import br.edu.insper.produtos.entity.produtos;
-import br.edu.insper.produtos.repository.produtosRepository;
+import br.edu.insper.produtos.entity.Produtos;
+import br.edu.insper.produtos.repository.ProdutosRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,6 @@ class ProdutosServiceTest {
         produtos = new Produtos();
         produtos.setId(1L);
         produtos.setNome("Java");
-        produtos.setCargaHoraria(20);
     }
 
     @Test

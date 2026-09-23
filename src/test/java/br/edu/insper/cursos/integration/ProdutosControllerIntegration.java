@@ -1,6 +1,6 @@
 package br.edu.insper.produtos.integration;
 
-import br.edu.insper.produtos.entity.produtos;
+import br.edu.insper.produtos.entity.Produtos;
 import br.edu.insper.produtos.repository.ProdutosRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ class ProdutosControllerIntegrationTest {
 
     @Test
     void deleteDeveMarcarProdutoComoDeletado() throws Exception {
-        Produtos produto = salvar("Java", false);
+        Produtos produtos = salvar("Java", false);
         mockMvc.perform(delete("/produtos/{id}", produtos.getId()))
                 .andExpect(status().isNoContent());
         assert repository.findById(produtos.getId()).orElseThrow().isDeleted();
@@ -70,7 +70,8 @@ class ProdutosControllerIntegrationTest {
         Produtos produtos = new Produtos();
         produtos.setNome(nome);
         produtos.setDescricao("Descrição");
-        produtos.setCargaHoraria(20);
+        // produtos.setPreco(preco);
+        // produtos.setQuantidade(quantidade);
         produtos.setDeleted(deleted);
         return repository.save(produtos);
     }

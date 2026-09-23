@@ -1,6 +1,6 @@
 package br.edu.insper.produtos.controller;
 
-import br.edu.insper.produtos.entity.Curso;
+import br.edu.insper.produtos.entity.Produtos;
 import br.edu.insper.produtos.service.ProdutosService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

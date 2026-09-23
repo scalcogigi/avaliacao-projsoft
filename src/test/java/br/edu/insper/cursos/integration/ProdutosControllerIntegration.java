@@ -1,7 +1,7 @@
 package br.edu.insper.produtos.integration;
 
 import br.edu.insper.produtos.entity.produtos;
-import br.edu.insper.produtos.repository.CursoRepository;
+import br.edu.insper.produtos.repository.ProdutosRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ class ProdutosControllerIntegrationTest {
         repository.deleteAll();
     }
 
-    @Test
+    @Test // teste para a criação de novos produtos
     void getDeveFiltrarEEsconderDeletados() throws Exception {
         salvar("Java", false);
         salvar("Javascript", false);
@@ -49,7 +49,7 @@ class ProdutosControllerIntegrationTest {
                 {"nome":"Java","descricao":"Spring Boot","cargaHoraria":20}
                 """;
 
-        mockMvc.perform(post("/cursos")
+        mockMvc.perform(post("/produtos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
